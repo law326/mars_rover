@@ -30,7 +30,7 @@ class Rover
   end
 
   def result
-    @current_position.last.merge({status: @status})
+    @current_position.last&.merge({status: @status})
   end
 
   private
