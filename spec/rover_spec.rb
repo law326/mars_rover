@@ -124,6 +124,19 @@ RSpec.describe Rover do
   end
 
   context 'when robot move off the grid' do
+    context 'with initial position alreayd off the grid' do
+      subject do
+        world_size = { m: 4, n: 4 }
+        position = { x: 6, y: 6, orientation: 'E' }
+        rover = described_class
+          .new(world_size: world_size, initial_position: position, instructions: ['F', 'F', 'R'])
+        rover.explore
+        rover.result
+      end
+
+      it { is_expected.to eq({ x: 6, y: 6, orientation: 'E', status: 'LOST' }) }
+    end
+
     context 'with x off the grid' do
       subject do
         world_size = { m: 4, n: 4 }

@@ -10,7 +10,7 @@ class Rover
     @current_orientation = initial_position[:orientation]
     @instructions = instructions
     @status = nil
-    @current_position = []
+    @current_position = [{ x: @current_x, y: @current_y, orientation: @current_orientation }]
   end
 
   def explore
