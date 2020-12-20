@@ -110,29 +110,44 @@ RSpec.describe Rover do
     end
   end
 
-  describe '#still_within_boundary?' do
-    context 'when robot is still within the grid' do
-      subject do
-        world_size = { m: 6, n: 6 }
-        position = { x: 4, y: 5, orientation: 'N' }
-        described_class
-          .new(world_size: world_size, initial_position: position, instructions: [])
-          .send(:still_within_boundary?)
-      end
-
-      it { is_expected.to eq(true) }
+  context 'when robot stay within the grid' do
+    subject do
+      world_size = { m: 6, n: 6 }
+      position = { x: 4, y: 2, orientation: 'N' }
+      rover = described_class
+        .new(world_size: world_size, initial_position: position, instructions: ['F', 'F', 'R'])
+      rover.explore
+      rover.result
     end
 
-    context 'when robot is off the grid' do
+    it { is_expected.to eq({ x: 4, y: 4, orientation: 'E', status: nil }) }
+  end
+
+  context 'when robot move off the grid' do
+    context 'with x off the grid' do
       subject do
-        world_size = { m: 3, n: 3 }
-        position = { x: 4, y: 5, orientation: 'N' }
-        described_class
-          .new(world_size: world_size, initial_position: position, instructions: [])
-          .send(:still_within_boundary?)
+        world_size = { m: 4, n: 4 }
+        position = { x: 3, y: 1, orientation: 'E' }
+        rover = described_class
+          .new(world_size: world_size, initial_position: position, instructions: ['F', 'F', 'R'])
+        rover.explore
+        rover.result
       end
 
-      it { is_expected.to eq(false) }
+      it { is_expected.to eq({ x: 4, y: 1, orientation: 'E', status: 'LOST' }) }
+    end
+
+    context 'with y off the grid' do
+      subject do
+        world_size = { m: 4, n: 4 }
+        position = { x: 1, y: 3, orientation: 'N' }
+        rover = described_class
+          .new(world_size: world_size, initial_position: position, instructions: ['F', 'F', 'R'])
+        rover.explore
+        rover.result
+      end
+
+      it { is_expected.to eq({ x: 1, y: 4, orientation: 'N', status: 'LOST' }) }
     end
   end
 end

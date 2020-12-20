@@ -10,29 +10,32 @@ class Rover
     @current_orientation = initial_position[:orientation]
     @instructions = instructions
     @status = nil
+    @current_position = []
   end
 
   def explore
+    make_the_move
+    return if @status == 'LOST'
     @instructions.each do |instruction|
-      @status = "LOST" && break unless still_within_boundary?
       case instruction
       when 'R', 'L'
-        rotate_orientation(instruction)
+        calculate_rotation(instruction)
       when 'F'
-        move_forward
+        calculate_move
       else
         raise(NotImplementedError, "Unexpected instruction: #{instruction}")
       end
+      make_the_move
     end
   end
 
   def result
-    { x: @current_x, y: @current_y, orientation: @current_orientation, status: @status }
+    @current_position.last.merge({status: @status})
   end
 
   private
 
-  def rotate_orientation(rotation)
+  def calculate_rotation(rotation)
     case rotation
     when 'R'
       current_index = ORIENTATIONS.index(@current_orientation)
@@ -43,7 +46,7 @@ class Rover
     end
   end
 
-  def move_forward
+  def calculate_move
     case @current_orientation
     when 'N'
       @current_y = @current_y + 1
@@ -60,5 +63,13 @@ class Rover
 
   def still_within_boundary?
     @current_x >= 0 && @current_x <= @world_size[:m] && @current_y >= 0 && @current_y <= @world_size[:n]
+  end
+
+  def make_the_move
+    if still_within_boundary?
+      @current_position << { x: @current_x, y: @current_y, orientation: @current_orientation }
+    else
+      @status = "LOST"
+    end
   end
 end
